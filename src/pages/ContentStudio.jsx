@@ -138,7 +138,7 @@ function ContentStudio() {
   }, []);
 
   const allContent = useMemo(() => {
-    return [...mockContent, ...contentQueue];
+    return contentQueue;
   }, [contentQueue]);
 
   return (
