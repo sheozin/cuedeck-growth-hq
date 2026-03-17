@@ -15,6 +15,7 @@ import {
   Trash2
 } from 'lucide-react';
 import useStore from '../store/useStore';
+import ConfigModal from '../components/ConfigModal';
 import { mockXQueue, mockXScheduled } from '../data/mockContent';
 import { formatTime, formatDate } from '../utils/formatters';
 import './XAgent.css';
@@ -24,6 +25,9 @@ function XAgent() {
   const updateXConfig = useStore((state) => state.updateXConfig);
   const [config, setConfig] = useState(settings.xConfig);
   const [queue, setQueue] = useState(mockXQueue);
+  const [scheduledPosts, setScheduledPosts] = useState(mockXScheduled);
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
 
   const stats = useMemo(() => [
     { label: 'Follows Today', value: '8/20', sublabel: 'limit', icon: UserPlus, color: '#4A8EFF' },
@@ -58,14 +62,38 @@ function XAgent() {
     setConfig((prev) => ({ ...prev, hashtags: tags }));
   }, []);
 
+  const handleEditPost = useCallback((post) => {
+    const newContent = prompt('Edit post content:', post.content);
+    if (newContent && newContent !== post.content) {
+      setScheduledPosts(prev => prev.map(p =>
+        p.id === post.id ? { ...p, content: newContent } : p
+      ));
+    }
+  }, []);
+
+  const handleDeletePost = useCallback((postId) => {
+    if (window.confirm('Are you sure you want to delete this scheduled post?')) {
+      setScheduledPosts(prev => prev.filter(p => p.id !== postId));
+    }
+  }, []);
+
   return (
     <div className="x-agent">
+      <ConfigModal
+        isOpen={showConfigModal}
+        onClose={() => setShowConfigModal(false)}
+        platform="x"
+      />
       <div className="connection-status">
         <div className="status-badge connected" role="status">
           <CheckCircle size={16} aria-hidden="true" />
           Connected to X API
         </div>
-        <button className="configure-btn" aria-label="Configure X API">
+        <button
+          className="configure-btn"
+          aria-label="Configure X API"
+          onClick={() => setShowConfigModal(true)}
+        >
           <Settings size={16} aria-hidden="true" />
           Configure
         </button>
@@ -223,7 +251,7 @@ function XAgent() {
           <section className="post-schedule" aria-labelledby="schedule-title">
             <h2 id="schedule-title" className="panel-title">Scheduled Posts</h2>
             <div className="scheduled-list" role="list">
-              {mockXScheduled.map((post) => (
+              {scheduledPosts.map((post) => (
                 <div key={post.id} className="scheduled-item" role="listitem">
                   <div className="scheduled-time">
                     <Clock size={14} aria-hidden="true" />
@@ -235,10 +263,18 @@ function XAgent() {
                     <span className={`status-badge ${post.status.toLowerCase()}`}>
                       {post.status}
                     </span>
-                    <button className="icon-btn" aria-label="Edit post">
+                    <button
+                      className="icon-btn"
+                      aria-label="Edit post"
+                      onClick={() => handleEditPost(post)}
+                    >
                       <Edit2 size={14} aria-hidden="true" />
                     </button>
-                    <button className="icon-btn danger" aria-label="Delete post">
+                    <button
+                      className="icon-btn danger"
+                      aria-label="Delete post"
+                      onClick={() => handleDeletePost(post.id)}
+                    >
                       <Trash2 size={14} aria-hidden="true" />
                     </button>
                   </div>

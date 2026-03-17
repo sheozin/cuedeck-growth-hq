@@ -23,6 +23,7 @@ function Dashboard() {
   const activities = useStore((state) => state.activities);
   const agentStatuses = useStore((state) => state.agentStatuses);
   const openLeadDrawer = useStore((state) => state.openLeadDrawer);
+  const updateLead = useStore((state) => state.updateLead);
   const activityRef = useRef(null);
 
   const hotLeads = useMemo(() =>
@@ -49,6 +50,10 @@ function Dashboard() {
   const handleOpenLead = useCallback((lead) => {
     openLeadDrawer(lead);
   }, [openLeadDrawer]);
+
+  const handleDismissLead = useCallback((leadId) => {
+    updateLead(leadId, { isHot: false });
+  }, [updateLead]);
 
   useEffect(() => {
     if (activityRef.current) {
@@ -159,7 +164,11 @@ function Dashboard() {
                         <Eye size={14} aria-hidden="true" />
                         View
                       </button>
-                      <button className="dismiss-btn" aria-label={`Dismiss ${lead.name}`}>
+                      <button
+                        className="dismiss-btn"
+                        aria-label={`Dismiss ${lead.name}`}
+                        onClick={() => handleDismissLead(lead.id)}
+                      >
                         <XCircle size={14} aria-hidden="true" />
                         Dismiss
                       </button>

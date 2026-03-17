@@ -11,8 +11,10 @@ import {
   Pause,
   Play,
   Users,
-  Mail
+  Mail,
+  X
 } from 'lucide-react';
+import ConfigModal from '../components/ConfigModal';
 import { mockSequences, mockDomains } from '../data/mockSequences';
 import { mockEmailContacts } from '../data/mockContent';
 import { formatDate } from '../utils/formatters';
@@ -22,6 +24,8 @@ import './EmailAgent.css';
 function EmailAgent() {
   const [expandedSequence, setExpandedSequence] = useState(null);
   const [sequences, setSequences] = useState(mockSequences);
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [viewingContacts, setViewingContacts] = useState(null);
 
   const stats = useMemo(() => [
     { label: 'Emails Sent Today', value: '47', sublabel: '', icon: Send, color: '#4A8EFF' },
@@ -42,14 +46,77 @@ function EmailAgent() {
     ));
   }, []);
 
+  const handleViewContacts = useCallback((sequence) => {
+    setViewingContacts(sequence);
+  }, []);
+
+  const sequenceContacts = useMemo(() => {
+    if (!viewingContacts) return [];
+    return mockEmailContacts.filter(c => c.sequence === viewingContacts.name);
+  }, [viewingContacts]);
+
   return (
     <div className="email-agent">
+      <ConfigModal
+        isOpen={showConfigModal}
+        onClose={() => setShowConfigModal(false)}
+        platform="email"
+      />
+
+      {/* View Contacts Modal */}
+      {viewingContacts && (
+        <div className="modal-overlay" onClick={() => setViewingContacts(null)}>
+          <div className="contacts-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Contacts in "{viewingContacts.name}"</h3>
+              <button className="close-btn" onClick={() => setViewingContacts(null)} aria-label="Close">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body">
+              {sequenceContacts.length === 0 ? (
+                <p className="empty-message">No contacts found in this sequence.</p>
+              ) : (
+                <table className="modal-contacts-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Company</th>
+                      <th>Step</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sequenceContacts.map(contact => (
+                      <tr key={contact.id}>
+                        <td>{contact.name}</td>
+                        <td>{contact.company}</td>
+                        <td>Step {contact.step}</td>
+                        <td>
+                          <span style={{ color: getStatusColor(contact.status) }}>
+                            {contact.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="connection-status">
         <div className="status-badge connected" role="status">
           <CheckCircle size={16} aria-hidden="true" />
           Connected to Instantly.ai
         </div>
-        <button className="configure-btn" aria-label="Configure Instantly.ai">
+        <button
+          className="configure-btn"
+          aria-label="Configure Instantly.ai"
+          onClick={() => setShowConfigModal(true)}
+        >
           <Settings size={16} aria-hidden="true" />
           Configure
         </button>
@@ -176,7 +243,10 @@ function EmailAgent() {
                     {sequence.status === 'active' ? <Pause size={14} aria-hidden="true" /> : <Play size={14} aria-hidden="true" />}
                     {sequence.status === 'active' ? 'Pause' : 'Resume'}
                   </button>
-                  <button className="view-contacts-btn" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className="view-contacts-btn"
+                    onClick={(e) => { e.stopPropagation(); handleViewContacts(sequence); }}
+                  >
                     View Contacts
                   </button>
                   {expandedSequence === sequence.id ? <ChevronUp size={20} aria-hidden="true" /> : <ChevronDown size={20} aria-hidden="true" />}

@@ -7,7 +7,9 @@ import {
   List,
   Linkedin,
   Twitter,
-  Mail
+  Mail,
+  X,
+  Save
 } from 'lucide-react';
 import useStore from '../store/useStore';
 import { formatDate } from '../utils/formatters';
@@ -23,12 +25,24 @@ const stages = [
   { key: 'Demo Booked', color: '#8b5cf6' },
 ];
 
+const emptyLead = {
+  name: '',
+  email: '',
+  company: '',
+  title: '',
+  stage: 'Discovered',
+  platforms: [],
+};
+
 function Pipeline() {
   const leads = useStore((state) => state.leads);
+  const addLead = useStore((state) => state.addLead);
   const openLeadDrawer = useStore((state) => state.openLeadDrawer);
   const [viewMode, setViewMode] = useState('table');
   const [searchQuery, setSearchQuery] = useState('');
   const [stageFilter, setStageFilter] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newLead, setNewLead] = useState(emptyLead);
 
   const filteredLeads = useMemo(() => {
     return leads.filter((lead) => {
@@ -52,8 +66,149 @@ function Pipeline() {
     openLeadDrawer(lead);
   }, [openLeadDrawer]);
 
+  const handleAddLead = useCallback(() => {
+    if (!newLead.name || !newLead.company) {
+      alert('Please fill in at least Name and Company');
+      return;
+    }
+    addLead({
+      ...newLead,
+      score: 50,
+      lastTouch: new Date().toISOString(),
+      signal: 'New Lead',
+      notes: '',
+      isHot: false,
+    });
+    setNewLead(emptyLead);
+    setShowAddModal(false);
+  }, [newLead, addLead]);
+
+  const handlePlatformToggle = useCallback((platform) => {
+    setNewLead(prev => ({
+      ...prev,
+      platforms: prev.platforms.includes(platform)
+        ? prev.platforms.filter(p => p !== platform)
+        : [...prev.platforms, platform]
+    }));
+  }, []);
+
   return (
     <div className="pipeline">
+      {/* Add Lead Modal */}
+      {showAddModal && (
+        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="add-lead-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Add New Lead</h3>
+              <button className="close-btn" onClick={() => setShowAddModal(false)} aria-label="Close">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="lead-name">Name *</label>
+                  <input
+                    id="lead-name"
+                    type="text"
+                    value={newLead.name}
+                    onChange={(e) => setNewLead({ ...newLead, name: e.target.value })}
+                    placeholder="Full name"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="lead-email">Email</label>
+                  <input
+                    id="lead-email"
+                    type="email"
+                    value={newLead.email}
+                    onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
+                    placeholder="email@company.com"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="lead-company">Company *</label>
+                  <input
+                    id="lead-company"
+                    type="text"
+                    value={newLead.company}
+                    onChange={(e) => setNewLead({ ...newLead, company: e.target.value })}
+                    placeholder="Company name"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="lead-title">Job Title</label>
+                  <input
+                    id="lead-title"
+                    type="text"
+                    value={newLead.title}
+                    onChange={(e) => setNewLead({ ...newLead, title: e.target.value })}
+                    placeholder="e.g., Event Director"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="lead-stage">Stage</label>
+                  <select
+                    id="lead-stage"
+                    value={newLead.stage}
+                    onChange={(e) => setNewLead({ ...newLead, stage: e.target.value })}
+                  >
+                    {stages.map(s => (
+                      <option key={s.key} value={s.key}>{s.key}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Platforms</label>
+                  <div className="platform-checkboxes">
+                    <label className="platform-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={newLead.platforms.includes('linkedin')}
+                        onChange={() => handlePlatformToggle('linkedin')}
+                      />
+                      <Linkedin size={16} />
+                      LinkedIn
+                    </label>
+                    <label className="platform-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={newLead.platforms.includes('x')}
+                        onChange={() => handlePlatformToggle('x')}
+                      />
+                      <Twitter size={16} />
+                      X
+                    </label>
+                    <label className="platform-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={newLead.platforms.includes('email')}
+                        onChange={() => handlePlatformToggle('email')}
+                      />
+                      <Mail size={16} />
+                      Email
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => setShowAddModal(false)}>
+                Cancel
+              </button>
+              <button className="btn-primary" onClick={handleAddLead}>
+                <Save size={16} />
+                Add Lead
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="pipeline-header">
         <div className="pipeline-filters">
           <div className="search-box">
@@ -83,7 +238,11 @@ function Pipeline() {
             </select>
           </div>
 
-          <button className="add-lead-btn" aria-label="Add new lead">
+          <button
+            className="add-lead-btn"
+            aria-label="Add new lead"
+            onClick={() => setShowAddModal(true)}
+          >
             <Plus size={18} aria-hidden="true" />
             Add Lead
           </button>

@@ -121,6 +121,22 @@ function Settings() {
     }
   }, [apiKeys, updateIntegrationStatus]);
 
+  const handleToggleConnection = useCallback((integrationKey) => {
+    const currentStatus = settings.integrationStatus[integrationKey];
+    if (currentStatus === 'connected') {
+      // Disconnect: clear API key and update status
+      updateApiKey(integrationKey, '');
+      updateIntegrationStatus(integrationKey, 'disconnected');
+    } else {
+      // Connect: prompt for API key
+      const key = prompt(`Enter API key for ${integrationKey}:`);
+      if (key) {
+        updateApiKey(integrationKey, key);
+        updateIntegrationStatus(integrationKey, 'connected');
+      }
+    }
+  }, [settings.integrationStatus, updateApiKey, updateIntegrationStatus]);
+
   const handleAddJobTitle = useCallback(() => {
     if (newJobTitle.trim()) {
       setIcpForm((prev) => ({
@@ -289,7 +305,10 @@ function Settings() {
                       'Test Connection'
                     )}
                   </button>
-                  <button className="connect-btn">
+                  <button
+                    className={`connect-btn ${settings.integrationStatus[integration.key] === 'connected' ? 'connected' : ''}`}
+                    onClick={() => handleToggleConnection(integration.key)}
+                  >
                     {settings.integrationStatus[integration.key] === 'connected'
                       ? 'Disconnect'
                       : 'Connect'}

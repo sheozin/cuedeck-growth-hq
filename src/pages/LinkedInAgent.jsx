@@ -12,6 +12,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import useStore from '../store/useStore';
+import ConfigModal from '../components/ConfigModal';
 import { mockLinkedinQueue, mockLinkedinLog } from '../data/mockContent';
 import { formatTime } from '../utils/formatters';
 import { getStatusColor } from '../utils/styles';
@@ -31,6 +32,7 @@ function LinkedInAgent() {
   const settings = useStore((state) => state.settings);
   const updateLinkedinConfig = useStore((state) => state.updateLinkedinConfig);
   const [config, setConfig] = useState(settings.linkedinConfig);
+  const [showConfigModal, setShowConfigModal] = useState(false);
 
   const stats = useMemo(() => [
     { label: 'Connects Sent Today', value: '12/20', sublabel: 'limit', icon: UserPlus, color: '#4A8EFF' },
@@ -65,12 +67,21 @@ function LinkedInAgent() {
 
   return (
     <div className="linkedin-agent">
+      <ConfigModal
+        isOpen={showConfigModal}
+        onClose={() => setShowConfigModal(false)}
+        platform="linkedin"
+      />
       <div className="connection-status">
         <div className="status-badge connected" role="status">
           <CheckCircle size={16} aria-hidden="true" />
           Connected via PhantomBuster
         </div>
-        <button className="configure-btn" aria-label="Configure PhantomBuster">
+        <button
+          className="configure-btn"
+          aria-label="Configure PhantomBuster"
+          onClick={() => setShowConfigModal(true)}
+        >
           <Settings size={16} aria-hidden="true" />
           Configure
         </button>

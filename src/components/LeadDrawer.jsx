@@ -70,6 +70,24 @@ function LeadDrawer() {
     }
   }, [selectedLead, updateLead, closeLeadDrawer]);
 
+  const handleSendLinkedInDM = useCallback(() => {
+    if (selectedLead?.linkedinUrl) {
+      // Open LinkedIn messaging (would integrate with PhantomBuster in production)
+      window.open(selectedLead.linkedinUrl, '_blank');
+      alert('LinkedIn profile opened. In production, this would queue a DM via PhantomBuster.');
+    } else {
+      alert('No LinkedIn URL available for this lead.');
+    }
+  }, [selectedLead]);
+
+  const handleAddToSequence = useCallback(() => {
+    if (selectedLead) {
+      // In production, this would add to an email sequence via Instantly.ai
+      updateLead(selectedLead.id, { stage: 'In Sequence' });
+      alert(`${selectedLead.name} has been added to the default email sequence.`);
+    }
+  }, [selectedLead, updateLead]);
+
   if (!isLeadDrawerOpen || !selectedLead) return null;
 
   return (
@@ -245,11 +263,19 @@ function LeadDrawer() {
           <section className="drawer-section" aria-labelledby="actions-heading">
             <h3 id="actions-heading" className="section-title">Manual Actions</h3>
             <div className="action-buttons">
-              <button className="action-btn linkedin" aria-label="Send LinkedIn direct message">
+              <button
+                className="action-btn linkedin"
+                aria-label="Send LinkedIn direct message"
+                onClick={handleSendLinkedInDM}
+              >
                 <Linkedin size={16} aria-hidden="true" />
                 Send LinkedIn DM
               </button>
-              <button className="action-btn email" aria-label="Add to email sequence">
+              <button
+                className="action-btn email"
+                aria-label="Add to email sequence"
+                onClick={handleAddToSequence}
+              >
                 <Mail size={16} aria-hidden="true" />
                 Add to Email Sequence
               </button>

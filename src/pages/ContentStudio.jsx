@@ -33,6 +33,7 @@ function ContentStudio() {
   const contentQueue = useStore((state) => state.contentQueue);
   const addToContentQueue = useStore((state) => state.addToContentQueue);
   const removeFromContentQueue = useStore((state) => state.removeFromContentQueue);
+  const updateContentItem = useStore((state) => state.updateContentItem);
 
   const [activeTab, setActiveTab] = useState('generator');
 
@@ -44,6 +45,7 @@ function ContentStudio() {
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
@@ -93,7 +95,28 @@ function ContentStudio() {
       type: 'post'
     });
     setGeneratedContent('');
+    setIsEditing(false);
   }, [platform, generatedContent, addToContentQueue]);
+
+  const handleEditContent = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
+  const handleContentChange = useCallback((e) => {
+    setGeneratedContent(e.target.value);
+  }, []);
+
+  const handlePublishNow = useCallback((item) => {
+    updateContentItem(item.id, { status: 'Published' });
+    alert(`Published: "${item.content.substring(0, 50)}..."`);
+  }, [updateContentItem]);
+
+  const handleEditQueueItem = useCallback((item) => {
+    const newContent = prompt('Edit content:', item.content);
+    if (newContent && newContent !== item.content) {
+      updateContentItem(item.id, { content: newContent });
+    }
+  }, [updateContentItem]);
 
   // Calendar helpers
   const weekDates = useMemo(() => {
@@ -258,7 +281,16 @@ function ContentStudio() {
                     <span>CueDeck</span>
                   </div>
                   <div className="preview-content">
-                    {generatedContent}
+                    {isEditing ? (
+                      <textarea
+                        className="content-editor"
+                        value={generatedContent}
+                        onChange={handleContentChange}
+                        rows={10}
+                      />
+                    ) : (
+                      generatedContent
+                    )}
                   </div>
                 </div>
 
@@ -267,9 +299,14 @@ function ContentStudio() {
                     <Copy size={16} aria-hidden="true" />
                     Copy
                   </button>
-                  <button className="action-btn" aria-label="Edit content">
+                  <button
+                    className={`action-btn ${isEditing ? 'active' : ''}`}
+                    onClick={handleEditContent}
+                    aria-label="Edit content"
+                    aria-pressed={isEditing}
+                  >
                     <Edit2 size={16} aria-hidden="true" />
-                    Edit
+                    {isEditing ? 'Editing...' : 'Edit'}
                   </button>
                   <button className="action-btn primary" onClick={handleAddToQueue} aria-label="Add to queue">
                     <Plus size={16} aria-hidden="true" />
@@ -370,11 +407,20 @@ function ContentStudio() {
                   </td>
                   <td>
                     <div className="queue-actions">
-                      <button className="queue-btn primary" aria-label="Publish now">
+                      <button
+                        className="queue-btn primary"
+                        aria-label="Publish now"
+                        onClick={() => handlePublishNow(item)}
+                        disabled={item.status === 'Published'}
+                      >
                         <Send size={14} aria-hidden="true" />
-                        Publish Now
+                        {item.status === 'Published' ? 'Published' : 'Publish Now'}
                       </button>
-                      <button className="queue-btn" aria-label="Edit">
+                      <button
+                        className="queue-btn"
+                        aria-label="Edit"
+                        onClick={() => handleEditQueueItem(item)}
+                      >
                         <Edit2 size={14} aria-hidden="true" />
                       </button>
                       <button
