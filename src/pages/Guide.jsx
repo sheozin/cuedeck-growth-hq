@@ -12,7 +12,6 @@ import {
   Zap,
   Target,
   MessageSquare,
-  Calendar,
   Shield,
   Workflow
 } from 'lucide-react';
