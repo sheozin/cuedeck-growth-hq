@@ -15,6 +15,7 @@ const LinkedInAgent = lazy(() => import('./pages/LinkedInAgent'));
 const XAgent = lazy(() => import('./pages/XAgent'));
 const EmailAgent = lazy(() => import('./pages/EmailAgent'));
 const Settings = lazy(() => import('./pages/Settings'));
+const Guide = lazy(() => import('./pages/Guide'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -48,6 +49,7 @@ function App() {
                   <Route path="/x" element={<XAgent />} />
                   <Route path="/email" element={<EmailAgent />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/guide" element={<Guide />} />
                 </Routes>
               </Suspense>
             </ErrorBoundary>

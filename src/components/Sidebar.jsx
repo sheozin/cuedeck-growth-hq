@@ -8,7 +8,8 @@ import {
   Twitter,
   Mail,
   Settings,
-  Menu
+  Menu,
+  BookOpen
 } from 'lucide-react';
 import useStore from '../store/useStore';
 import './Sidebar.css';
@@ -21,6 +22,7 @@ const navItems = [
   { path: '/x', icon: Twitter, label: 'X Agent' },
   { path: '/email', icon: Mail, label: 'Email Agent' },
   { path: '/settings', icon: Settings, label: 'Settings' },
+  { path: '/guide', icon: BookOpen, label: 'Guide' },
 ];
 
 function Sidebar() {
