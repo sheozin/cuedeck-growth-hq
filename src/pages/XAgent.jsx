@@ -27,7 +27,6 @@ function XAgent() {
   const [queue, setQueue] = useState(mockXQueue);
   const [scheduledPosts, setScheduledPosts] = useState(mockXScheduled);
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [editingPost, setEditingPost] = useState(null);
 
   const stats = useMemo(() => [
     { label: 'Follows Today', value: '8/20', sublabel: 'limit', icon: UserPlus, color: '#4A8EFF' },
