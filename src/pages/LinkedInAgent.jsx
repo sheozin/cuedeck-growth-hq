@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import {
   Settings,
   CheckCircle,
-  Users,
   Percent,
   Eye,
   MessageSquare,

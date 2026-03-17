@@ -1,5 +1,5 @@
 import React from 'react';
-import { getStatusColor, getStatusLabel } from '../utils/styles';
+import { getStatusLabel } from '../utils/styles';
 import './AgentCard.css';
 
 function AgentCard({ name, status, task, tasksToday, icon: Icon }) {

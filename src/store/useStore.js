@@ -7,7 +7,7 @@ import { mockContent } from '../data/mockContent';
 
 const useStore = create(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       // Leads
       leads: mockLeads,
       selectedLead: null,

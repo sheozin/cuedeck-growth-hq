@@ -11,7 +11,6 @@ import {
   RefreshCw,
   Calendar,
   Clock,
-  CheckCircle,
   XCircle,
   Loader
 } from 'lucide-react';
