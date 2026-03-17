@@ -65,18 +65,9 @@ const useStore = create(
         ),
       })),
 
-      // Settings & API Keys
+      // Settings (NON-SENSITIVE only - API keys are NOT persisted)
       settings: {
-        apiKeys: {
-          claude: '',
-          phantombuster: '',
-          phantombusterAgentId: '',
-          instantly: '',
-          apollo: '',
-          airtableKey: '',
-          airtableBaseId: '',
-          n8nWebhook: '',
-        },
+        // Integration status only (not the actual keys)
         integrationStatus: {
           claude: 'disconnected',
           phantombuster: 'disconnected',
@@ -125,12 +116,22 @@ const useStore = create(
           accountsToEngage: '',
         },
       },
+
+      // API Keys stored in memory only (NOT persisted to localStorage)
+      apiKeys: {
+        claude: '',
+        phantombuster: '',
+        phantombusterAgentId: '',
+        instantly: '',
+        apollo: '',
+        airtableKey: '',
+        airtableBaseId: '',
+        n8nWebhook: '',
+      },
       updateApiKey: (key, value) => set((state) => ({
-        settings: {
-          ...state.settings,
-          apiKeys: { ...state.settings.apiKeys, [key]: value },
-        },
+        apiKeys: { ...state.apiKeys, [key]: value },
       })),
+
       updateIntegrationStatus: (key, status) => set((state) => ({
         settings: {
           ...state.settings,
@@ -177,8 +178,17 @@ const useStore = create(
     }),
     {
       name: 'cuedeck-storage',
+      // Only persist non-sensitive settings - NEVER persist API keys
       partialize: (state) => ({
-        settings: state.settings,
+        settings: {
+          integrationStatus: state.settings.integrationStatus,
+          icpProfile: state.settings.icpProfile,
+          brandVoice: state.settings.brandVoice,
+          notifications: state.settings.notifications,
+          linkedinConfig: state.settings.linkedinConfig,
+          xConfig: state.settings.xConfig,
+        },
+        sidebarCollapsed: state.sidebarCollapsed,
       }),
     }
   )

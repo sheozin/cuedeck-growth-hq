@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Users,
   Zap,
@@ -15,37 +15,40 @@ import {
 } from 'lucide-react';
 import useStore from '../store/useStore';
 import AgentCard from '../components/AgentCard';
+import { formatTime } from '../utils/formatters';
 import './Dashboard.css';
 
 function Dashboard() {
-  const { leads, activities, agentStatuses, openLeadDrawer } = useStore();
+  const leads = useStore((state) => state.leads);
+  const activities = useStore((state) => state.activities);
+  const agentStatuses = useStore((state) => state.agentStatuses);
+  const openLeadDrawer = useStore((state) => state.openLeadDrawer);
   const activityRef = useRef(null);
 
-  const hotLeads = leads.filter((lead) => lead.isHot);
+  const hotLeads = useMemo(() =>
+    leads.filter((lead) => lead.isHot),
+    [leads]
+  );
 
-  const stats = [
+  const stats = useMemo(() => [
     { label: 'Total Leads', value: leads.length, delta: '+4 today', positive: true, icon: Users },
     { label: 'Active Sequences', value: 3, delta: '+1 today', positive: true, icon: Zap },
     { label: 'Posts Scheduled', value: 12, delta: '+2 today', positive: true, icon: Calendar },
     { label: 'Replies Today', value: 7, delta: '+3 vs yesterday', positive: true, icon: MessageSquare },
-  ];
+  ], [leads.length]);
 
-  const agents = [
+  const agents = useMemo(() => [
     { key: 'orchestrator', name: 'Orchestrator', icon: Bot, ...agentStatuses.orchestrator },
     { key: 'contentGenerator', name: 'Content Generator', icon: PenTool, ...agentStatuses.contentGenerator },
     { key: 'linkedinAgent', name: 'LinkedIn Agent', icon: Linkedin, ...agentStatuses.linkedinAgent },
     { key: 'xAgent', name: 'X Agent', icon: Twitter, ...agentStatuses.xAgent },
     { key: 'emailAgent', name: 'Email Agent', icon: Mail, ...agentStatuses.emailAgent },
     { key: 'crmAgent', name: 'CRM Agent', icon: Database, ...agentStatuses.crmAgent },
-  ];
+  ], [agentStatuses]);
 
-  const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const handleOpenLead = useCallback((lead) => {
+    openLeadDrawer(lead);
+  }, [openLeadDrawer]);
 
   useEffect(() => {
     if (activityRef.current) {
@@ -55,10 +58,10 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-      <section className="stats-row">
+      <section className="stats-row" aria-label="Key metrics">
         {stats.map((stat) => (
           <div key={stat.label} className="stat-card">
-            <div className="stat-icon">
+            <div className="stat-icon" aria-hidden="true">
               <stat.icon size={20} />
             </div>
             <div className="stat-content">
@@ -73,9 +76,9 @@ function Dashboard() {
       </section>
 
       <div className="dashboard-grid">
-        <section className="agents-panel">
-          <h2 className="panel-title">Agent Status</h2>
-          <div className="agents-list">
+        <section className="agents-panel" aria-labelledby="agents-title">
+          <h2 id="agents-title" className="panel-title">Agent Status</h2>
+          <div className="agents-list" role="list">
             {agents.map((agent) => (
               <AgentCard
                 key={agent.key}
@@ -89,9 +92,15 @@ function Dashboard() {
           </div>
         </section>
 
-        <section className="activity-panel">
-          <h2 className="panel-title">Activity Feed</h2>
-          <div className="activity-feed" ref={activityRef}>
+        <section className="activity-panel" aria-labelledby="activity-title">
+          <h2 id="activity-title" className="panel-title">Activity Feed</h2>
+          <div
+            className="activity-feed"
+            ref={activityRef}
+            role="log"
+            aria-live="polite"
+            aria-label="Recent agent activities"
+          >
             {activities.slice(0, 20).map((activity) => (
               <div key={activity.id} className="activity-item">
                 <span className="activity-time">{formatTime(activity.timestamp)}</span>
@@ -103,18 +112,18 @@ function Dashboard() {
         </section>
       </div>
 
-      <section className="hot-leads-panel">
-        <h2 className="panel-title">Hot Leads</h2>
+      <section className="hot-leads-panel" aria-labelledby="hot-leads-title">
+        <h2 id="hot-leads-title" className="panel-title">Hot Leads</h2>
         <div className="hot-leads-table-wrapper">
-          <table className="hot-leads-table">
+          <table className="hot-leads-table" aria-label="Hot leads requiring attention">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Company</th>
-                <th>Title</th>
-                <th>Signal</th>
-                <th>Platform</th>
-                <th>Actions</th>
+                <th scope="col">Name</th>
+                <th scope="col">Company</th>
+                <th scope="col">Title</th>
+                <th scope="col">Signal</th>
+                <th scope="col">Platform</th>
+                <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -122,7 +131,7 @@ function Dashboard() {
                 <tr key={lead.id}>
                   <td>
                     <div className="lead-name-cell">
-                      <div className="lead-avatar-small">
+                      <div className="lead-avatar-small" aria-hidden="true">
                         {lead.name.split(' ').map((n) => n[0]).join('')}
                       </div>
                       <span>{lead.name}</span>
@@ -134,20 +143,24 @@ function Dashboard() {
                     <span className="signal-badge">{lead.signal}</span>
                   </td>
                   <td>
-                    <div className="platform-icons">
-                      {lead.platforms.includes('linkedin') && <Linkedin size={16} />}
-                      {lead.platforms.includes('x') && <Twitter size={16} />}
-                      {lead.platforms.includes('email') && <Mail size={16} />}
+                    <div className="platform-icons" aria-label={`Platforms: ${lead.platforms.join(', ')}`}>
+                      {lead.platforms.includes('linkedin') && <Linkedin size={16} aria-hidden="true" />}
+                      {lead.platforms.includes('x') && <Twitter size={16} aria-hidden="true" />}
+                      {lead.platforms.includes('email') && <Mail size={16} aria-hidden="true" />}
                     </div>
                   </td>
                   <td>
                     <div className="action-btns">
-                      <button className="view-btn" onClick={() => openLeadDrawer(lead)}>
-                        <Eye size={14} />
+                      <button
+                        className="view-btn"
+                        onClick={() => handleOpenLead(lead)}
+                        aria-label={`View ${lead.name}`}
+                      >
+                        <Eye size={14} aria-hidden="true" />
                         View
                       </button>
-                      <button className="dismiss-btn">
-                        <XCircle size={14} />
+                      <button className="dismiss-btn" aria-label={`Dismiss ${lead.name}`}>
+                        <XCircle size={14} aria-hidden="true" />
                         Dismiss
                       </button>
                     </div>

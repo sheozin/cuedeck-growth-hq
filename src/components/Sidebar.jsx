@@ -24,17 +24,28 @@ const navItems = [
 ];
 
 function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar, agentStatuses } = useStore();
+  const sidebarCollapsed = useStore((state) => state.sidebarCollapsed);
+  const toggleSidebar = useStore((state) => state.toggleSidebar);
+  const agentStatuses = useStore((state) => state.agentStatuses);
 
   const allRunning = Object.values(agentStatuses).every(
     (agent) => agent.status === 'running' || agent.status === 'paused'
   );
 
   return (
-    <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+    <aside
+      className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}
+      role="navigation"
+      aria-label="Main navigation"
+    >
       <div className="sidebar-header">
-        <button className="menu-toggle" onClick={toggleSidebar}>
-          <Menu size={20} />
+        <button
+          className="menu-toggle"
+          onClick={toggleSidebar}
+          aria-expanded={!sidebarCollapsed}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <Menu size={20} aria-hidden="true" />
         </button>
         {!sidebarCollapsed && (
           <div className="logo">
@@ -44,23 +55,28 @@ function Sidebar() {
         )}
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className="sidebar-nav" aria-label="Main menu">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             title={sidebarCollapsed ? item.label : undefined}
+            aria-label={item.label}
           >
-            <item.icon size={20} />
+            <item.icon size={20} aria-hidden="true" />
             {!sidebarCollapsed && <span>{item.label}</span>}
           </NavLink>
         ))}
       </nav>
 
       <div className="sidebar-footer">
-        <div className={`status-indicator ${allRunning ? 'running' : 'stopped'}`}>
-          <span className="status-dot"></span>
+        <div
+          className={`status-indicator ${allRunning ? 'running' : 'stopped'}`}
+          role="status"
+          aria-label={allRunning ? 'All agents running' : 'Some agents stopped'}
+        >
+          <span className="status-dot" aria-hidden="true"></span>
           {!sidebarCollapsed && (
             <span className="status-text">
               {allRunning ? 'All agents running' : 'Agents stopped'}
@@ -72,4 +88,4 @@ function Sidebar() {
   );
 }
 
-export default Sidebar;
+export default React.memo(Sidebar);

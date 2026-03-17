@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Settings,
   CheckCircle,
@@ -13,61 +13,52 @@ import {
   Users,
   Mail
 } from 'lucide-react';
-import useStore from '../store/useStore';
 import { mockSequences, mockDomains } from '../data/mockSequences';
 import { mockEmailContacts } from '../data/mockContent';
+import { formatDate } from '../utils/formatters';
+import { getStatusColor } from '../utils/styles';
 import './EmailAgent.css';
 
 function EmailAgent() {
   const [expandedSequence, setExpandedSequence] = useState(null);
   const [sequences, setSequences] = useState(mockSequences);
 
-  const stats = [
+  const stats = useMemo(() => [
     { label: 'Emails Sent Today', value: '47', sublabel: '', icon: Send, color: '#4A8EFF' },
     { label: 'Open Rate', value: '31%', sublabel: 'last 7 days', icon: Eye, color: '#22c55e' },
     { label: 'Reply Rate', value: '8%', sublabel: 'last 7 days', icon: MessageSquare, color: '#8b5cf6' },
     { label: 'Bounced', value: '2', sublabel: 'today', icon: AlertCircle, color: '#ef4444' },
-  ];
+  ], []);
 
-  const toggleSequence = (id) => {
-    setExpandedSequence(expandedSequence === id ? null : id);
-  };
+  const toggleSequence = useCallback((id) => {
+    setExpandedSequence((prev) => prev === id ? null : id);
+  }, []);
 
-  const toggleSequenceStatus = (id) => {
-    setSequences(sequences.map(seq =>
+  const toggleSequenceStatus = useCallback((id) => {
+    setSequences((prev) => prev.map(seq =>
       seq.id === id
         ? { ...seq, status: seq.status === 'active' ? 'paused' : 'active' }
         : seq
     ));
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Active': return '#22c55e';
-      case 'Replied': return '#8b5cf6';
-      case 'Bounced': return '#ef4444';
-      case 'Unsubscribed': return '#9ca3af';
-      default: return '#64748b';
-    }
-  };
+  }, []);
 
   return (
     <div className="email-agent">
       <div className="connection-status">
-        <div className="status-badge connected">
-          <CheckCircle size={16} />
+        <div className="status-badge connected" role="status">
+          <CheckCircle size={16} aria-hidden="true" />
           Connected to Instantly.ai
         </div>
-        <button className="configure-btn">
-          <Settings size={16} />
+        <button className="configure-btn" aria-label="Configure Instantly.ai">
+          <Settings size={16} aria-hidden="true" />
           Configure
         </button>
       </div>
 
-      <div className="stats-row">
+      <div className="stats-row" role="region" aria-label="Email Agent statistics">
         {stats.map((stat) => (
           <div key={stat.label} className="stat-card">
-            <div className="stat-icon" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
+            <div className="stat-icon" style={{ backgroundColor: `${stat.color}15`, color: stat.color }} aria-hidden="true">
               <stat.icon size={20} />
             </div>
             <div className="stat-content">
@@ -79,16 +70,16 @@ function EmailAgent() {
         ))}
       </div>
 
-      <section className="warmup-section">
-        <h2 className="section-title">Domain Warmup Status</h2>
+      <section className="warmup-section" aria-labelledby="warmup-title">
+        <h2 id="warmup-title" className="section-title">Domain Warmup Status</h2>
         <div className="warmup-table-wrapper">
-          <table className="warmup-table">
+          <table className="warmup-table" aria-label="Domain warmup status">
             <thead>
               <tr>
-                <th>Domain</th>
-                <th>Warmup Score</th>
-                <th>Daily Limit</th>
-                <th>Status</th>
+                <th scope="col">Domain</th>
+                <th scope="col">Warmup Score</th>
+                <th scope="col">Daily Limit</th>
+                <th scope="col">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -96,13 +87,20 @@ function EmailAgent() {
                 <tr key={domain.id}>
                   <td>
                     <div className="domain-cell">
-                      <Mail size={16} />
+                      <Mail size={16} aria-hidden="true" />
                       {domain.domain}
                     </div>
                   </td>
                   <td>
                     <div className="warmup-score">
-                      <div className="score-bar">
+                      <div
+                        className="score-bar"
+                        role="progressbar"
+                        aria-valuenow={domain.warmupScore}
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-label={`Warmup score: ${domain.warmupScore} of 100`}
+                      >
                         <div
                           className="score-fill"
                           style={{
@@ -127,17 +125,29 @@ function EmailAgent() {
         </div>
       </section>
 
-      <section className="sequences-section">
-        <h2 className="section-title">Active Sequences</h2>
-        <div className="sequences-list">
+      <section className="sequences-section" aria-labelledby="sequences-title">
+        <h2 id="sequences-title" className="section-title">Active Sequences</h2>
+        <div className="sequences-list" role="list">
           {sequences.map((sequence) => (
-            <div key={sequence.id} className={`sequence-card ${expandedSequence === sequence.id ? 'expanded' : ''}`}>
-              <div className="sequence-header" onClick={() => toggleSequence(sequence.id)}>
+            <div
+              key={sequence.id}
+              className={`sequence-card ${expandedSequence === sequence.id ? 'expanded' : ''}`}
+              role="listitem"
+            >
+              <div
+                className="sequence-header"
+                onClick={() => toggleSequence(sequence.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && toggleSequence(sequence.id)}
+                aria-expanded={expandedSequence === sequence.id}
+                aria-controls={`sequence-details-${sequence.id}`}
+              >
                 <div className="sequence-main">
                   <h3 className="sequence-name">{sequence.name}</h3>
                   <div className="sequence-meta">
                     <span className="meta-item">
-                      <Users size={14} />
+                      <Users size={14} aria-hidden="true" />
                       {sequence.contacts} contacts
                     </span>
                     <span className="meta-item">
@@ -148,11 +158,11 @@ function EmailAgent() {
 
                 <div className="sequence-stats">
                   <div className="stat-pill">
-                    <Eye size={12} />
+                    <Eye size={12} aria-hidden="true" />
                     {sequence.openRate}% open
                   </div>
                   <div className="stat-pill">
-                    <MessageSquare size={12} />
+                    <MessageSquare size={12} aria-hidden="true" />
                     {sequence.replyRate}% reply
                   </div>
                 </div>
@@ -161,26 +171,28 @@ function EmailAgent() {
                   <button
                     className={`toggle-btn ${sequence.status === 'active' ? 'active' : 'paused'}`}
                     onClick={(e) => { e.stopPropagation(); toggleSequenceStatus(sequence.id); }}
+                    aria-label={sequence.status === 'active' ? 'Pause sequence' : 'Resume sequence'}
                   >
-                    {sequence.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
+                    {sequence.status === 'active' ? <Pause size={14} aria-hidden="true" /> : <Play size={14} aria-hidden="true" />}
                     {sequence.status === 'active' ? 'Pause' : 'Resume'}
                   </button>
                   <button className="view-contacts-btn" onClick={(e) => e.stopPropagation()}>
                     View Contacts
                   </button>
-                  {expandedSequence === sequence.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  {expandedSequence === sequence.id ? <ChevronUp size={20} aria-hidden="true" /> : <ChevronDown size={20} aria-hidden="true" />}
                 </div>
               </div>
 
               {expandedSequence === sequence.id && (
-                <div className="sequence-details">
-                  <div className="steps-timeline">
+                <div id={`sequence-details-${sequence.id}`} className="sequence-details">
+                  <div className="steps-timeline" role="list" aria-label="Sequence steps">
                     {sequence.steps.map((step, index) => (
                       <div
                         key={step.step}
                         className={`step-item ${index < sequence.currentStep ? 'completed' : index === sequence.currentStep - 1 ? 'current' : 'upcoming'}`}
+                        role="listitem"
                       >
-                        <div className="step-indicator">
+                        <div className="step-indicator" aria-hidden="true">
                           <span className="step-number">{step.step}</span>
                         </div>
                         <div className="step-content">
@@ -201,18 +213,18 @@ function EmailAgent() {
         </div>
       </section>
 
-      <section className="contacts-section">
-        <h2 className="section-title">Active Contacts</h2>
+      <section className="contacts-section" aria-labelledby="contacts-title">
+        <h2 id="contacts-title" className="section-title">Active Contacts</h2>
         <div className="contacts-table-wrapper">
-          <table className="contacts-table">
+          <table className="contacts-table" aria-label="Active email contacts">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Company</th>
-                <th>Sequence</th>
-                <th>Step</th>
-                <th>Last Sent</th>
-                <th>Status</th>
+                <th scope="col">Name</th>
+                <th scope="col">Company</th>
+                <th scope="col">Sequence</th>
+                <th scope="col">Step</th>
+                <th scope="col">Last Sent</th>
+                <th scope="col">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -222,12 +234,7 @@ function EmailAgent() {
                   <td>{contact.company}</td>
                   <td>{contact.sequence}</td>
                   <td>Step {contact.step}</td>
-                  <td>
-                    {new Date(contact.lastSent).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </td>
+                  <td>{formatDate(contact.lastSent)}</td>
                   <td>
                     <span
                       className="contact-status"

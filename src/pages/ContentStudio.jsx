@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Linkedin,
   Twitter,
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import useStore from '../store/useStore';
 import { mockContent } from '../data/mockContent';
+import { formatDate, formatTime } from '../utils/formatters';
 import './ContentStudio.css';
 
 const platforms = [
@@ -30,7 +31,10 @@ const platforms = [
 const tones = ['Professional', 'Conversational', 'Bold', 'Storytelling'];
 
 function ContentStudio() {
-  const { contentQueue, addToContentQueue, updateContentItem, removeFromContentQueue, settings } = useStore();
+  const contentQueue = useStore((state) => state.contentQueue);
+  const addToContentQueue = useStore((state) => state.addToContentQueue);
+  const removeFromContentQueue = useStore((state) => state.removeFromContentQueue);
+
   const [activeTab, setActiveTab] = useState('generator');
 
   // Generator state
@@ -42,70 +46,45 @@ function ContentStudio() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
 
-  const handleGenerate = async () => {
+  const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setError('');
     setGeneratedContent('');
 
-    const apiKey = process.env.REACT_APP_ANTHROPIC_KEY || settings.apiKeys.claude;
-
-    if (!apiKey) {
-      setError('Please add your Claude API key in Settings > Integrations');
-      setIsGenerating(false);
-      return;
-    }
-
-    const platformLabel = platforms.find(p => p.value === platform)?.label || platform;
-
-    const systemPrompt = `You are a B2B SaaS marketing copywriter for CueDeck (cuedeck.io), a real-time conference control platform used by event production companies. Pricing: €39/event, €59/mo Starter, €99/mo Pro. Key features: 8-state session machine, 6 operator roles, AI Incident Advisor, live signage, simultaneous interpretation control, post-event reports. ICP: conference organizers, AV production companies, event managers running 100-2000 person events. Write copy that is specific, value-driven, and never generic.`;
-
-    const userPrompt = `Write a ${platformLabel} for this target audience: ${icpTarget}
-
-Topic/Angle: ${topic}
-
-Tone: ${tone}
-
-${platform === 'x-thread' ? 'Format as a thread with 3-5 tweets, each on its own line starting with a number.' : ''}
-${platform === 'email-subject' ? 'Provide 5 subject line variations, each on its own line.' : ''}
-${platform === 'linkedin-dm' ? 'Keep it short, personal, and under 300 characters.' : ''}
-${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful and engaging.' : ''}`;
-
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      // Use server-side API proxy to keep API key secure
+      const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
           'content-type': 'application/json',
-          'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1024,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: userPrompt }]
-        })
+          platform,
+          icpTarget,
+          topic,
+          tone,
+        }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to generate content');
+        throw new Error(data.error || 'Failed to generate content');
       }
 
-      const data = await response.json();
-      setGeneratedContent(data.content[0].text);
+      setGeneratedContent(data.content);
     } catch (err) {
-      setError(err.message || 'Failed to generate content. Please check your API key.');
+      setError(err.message || 'Failed to generate content. Please try again.');
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [platform, icpTarget, topic, tone]);
 
-  const handleCopy = () => {
+  const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(generatedContent);
-  };
+  }, [generatedContent]);
 
-  const handleAddToQueue = () => {
+  const handleAddToQueue = useCallback(() => {
     const platformIcon = platform.includes('linkedin') ? 'linkedin' : platform.includes('x') ? 'x' : 'email';
     addToContentQueue({
       platform: platformIcon,
@@ -115,10 +94,10 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
       type: 'post'
     });
     setGeneratedContent('');
-  };
+  }, [platform, generatedContent, addToContentQueue]);
 
   // Calendar helpers
-  const getWeekDates = () => {
+  const weekDates = useMemo(() => {
     const today = new Date();
     const dates = [];
     for (let i = 0; i < 7; i++) {
@@ -127,38 +106,44 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
       dates.push(date);
     }
     return dates;
-  };
+  }, []);
 
-  const weekDates = getWeekDates();
-
-  const getPostsForDate = (date) => {
+  const getPostsForDate = useCallback((date) => {
     return mockContent.filter((post) => {
       const postDate = new Date(post.scheduledTime);
       return postDate.toDateString() === date.toDateString();
     });
-  };
+  }, []);
 
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  };
+  const allContent = useMemo(() => {
+    return [...mockContent, ...contentQueue];
+  }, [contentQueue]);
 
   return (
     <div className="content-studio">
-      <div className="tabs">
+      <div className="tabs" role="tablist" aria-label="Content Studio tabs">
         <button
+          role="tab"
+          aria-selected={activeTab === 'generator'}
+          aria-controls="generator-panel"
           className={activeTab === 'generator' ? 'active' : ''}
           onClick={() => setActiveTab('generator')}
         >
           Generator
         </button>
         <button
+          role="tab"
+          aria-selected={activeTab === 'calendar'}
+          aria-controls="calendar-panel"
           className={activeTab === 'calendar' ? 'active' : ''}
           onClick={() => setActiveTab('calendar')}
         >
           Calendar
         </button>
         <button
+          role="tab"
+          aria-selected={activeTab === 'queue'}
+          aria-controls="queue-panel"
           className={activeTab === 'queue' ? 'active' : ''}
           onClick={() => setActiveTab('queue')}
         >
@@ -167,29 +152,35 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
       </div>
 
       {activeTab === 'generator' && (
-        <div className="generator-layout">
+        <div id="generator-panel" role="tabpanel" className="generator-layout">
           <div className="generator-form">
-            <h3>Create Content</h3>
+            <h3 id="create-content-heading">Create Content</h3>
 
             <div className="form-group">
-              <label>Platform</label>
-              <div className="platform-selector">
+              <label id="platform-label">Platform</label>
+              <div
+                className="platform-selector"
+                role="group"
+                aria-labelledby="platform-label"
+              >
                 {platforms.map((p) => (
                   <button
                     key={p.value}
                     className={platform === p.value ? 'active' : ''}
                     onClick={() => setPlatform(p.value)}
+                    aria-pressed={platform === p.value}
                   >
-                    <p.icon size={16} />
-                    {p.label}
+                    <p.icon size={16} aria-hidden="true" />
+                    <span>{p.label}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="form-group">
-              <label>ICP Target</label>
+              <label htmlFor="icp-target">ICP Target</label>
               <input
+                id="icp-target"
                 type="text"
                 value={icpTarget}
                 onChange={(e) => setIcpTarget(e.target.value)}
@@ -198,8 +189,9 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
             </div>
 
             <div className="form-group">
-              <label>Topic / Angle</label>
+              <label htmlFor="topic">Topic / Angle</label>
               <input
+                id="topic"
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
@@ -208,13 +200,18 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
             </div>
 
             <div className="form-group">
-              <label>Tone</label>
-              <div className="tone-selector">
+              <label id="tone-label">Tone</label>
+              <div
+                className="tone-selector"
+                role="group"
+                aria-labelledby="tone-label"
+              >
                 {tones.map((t) => (
                   <button
                     key={t}
                     className={tone === t ? 'active' : ''}
                     onClick={() => setTone(t)}
+                    aria-pressed={tone === t}
                   >
                     {t}
                   </button>
@@ -226,15 +223,16 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
               className="generate-btn"
               onClick={handleGenerate}
               disabled={isGenerating}
+              aria-busy={isGenerating}
             >
               {isGenerating ? (
                 <>
-                  <Loader size={18} className="spinner" />
+                  <Loader size={18} className="spinner" aria-hidden="true" />
                   Generating...
                 </>
               ) : (
                 <>
-                  <RefreshCw size={18} />
+                  <RefreshCw size={18} aria-hidden="true" />
                   Generate
                 </>
               )}
@@ -245,8 +243,8 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
             <h3>Preview</h3>
 
             {error && (
-              <div className="error-message">
-                <XCircle size={18} />
+              <div className="error-message" role="alert">
+                <XCircle size={18} aria-hidden="true" />
                 {error}
               </div>
             )}
@@ -255,9 +253,9 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
               <>
                 <div className={`content-preview ${platform.includes('linkedin') ? 'linkedin-style' : platform.includes('x') ? 'x-style' : 'email-style'}`}>
                   <div className="preview-header">
-                    {platform.includes('linkedin') && <Linkedin size={20} />}
-                    {platform.includes('x') && <Twitter size={20} />}
-                    {platform.includes('email') && <Mail size={20} />}
+                    {platform.includes('linkedin') && <Linkedin size={20} aria-hidden="true" />}
+                    {platform.includes('x') && <Twitter size={20} aria-hidden="true" />}
+                    {platform.includes('email') && <Mail size={20} aria-hidden="true" />}
                     <span>CueDeck</span>
                   </div>
                   <div className="preview-content">
@@ -266,26 +264,31 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
                 </div>
 
                 <div className="preview-actions">
-                  <button className="action-btn" onClick={handleCopy}>
-                    <Copy size={16} />
+                  <button className="action-btn" onClick={handleCopy} aria-label="Copy content">
+                    <Copy size={16} aria-hidden="true" />
                     Copy
                   </button>
-                  <button className="action-btn">
-                    <Edit2 size={16} />
+                  <button className="action-btn" aria-label="Edit content">
+                    <Edit2 size={16} aria-hidden="true" />
                     Edit
                   </button>
-                  <button className="action-btn primary" onClick={handleAddToQueue}>
-                    <Plus size={16} />
+                  <button className="action-btn primary" onClick={handleAddToQueue} aria-label="Add to queue">
+                    <Plus size={16} aria-hidden="true" />
                     Add to Queue
                   </button>
-                  <button className="action-btn" onClick={handleGenerate} disabled={isGenerating}>
-                    <RefreshCw size={16} />
+                  <button
+                    className="action-btn"
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    aria-label="Regenerate content"
+                  >
+                    <RefreshCw size={16} aria-hidden="true" />
                     Regenerate
                   </button>
                 </div>
               </>
             ) : (
-              <div className="empty-preview">
+              <div className="empty-preview" aria-live="polite">
                 <p>Generated content will appear here</p>
               </div>
             )}
@@ -294,10 +297,10 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
       )}
 
       {activeTab === 'calendar' && (
-        <div className="calendar-view">
-          <div className="calendar-grid">
+        <div id="calendar-panel" role="tabpanel" className="calendar-view">
+          <div className="calendar-grid" role="grid" aria-label="Content calendar">
             {weekDates.map((date) => (
-              <div key={date.toISOString()} className="calendar-day">
+              <div key={date.toISOString()} className="calendar-day" role="gridcell">
                 <div className="day-header">
                   <span className="day-name">
                     {date.toLocaleDateString('en-US', { weekday: 'short' })}
@@ -310,8 +313,8 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
                   {getPostsForDate(date).map((post) => (
                     <div key={post.id} className={`calendar-post ${post.platform}`}>
                       <div className="post-header">
-                        {post.platform === 'linkedin' && <Linkedin size={12} />}
-                        {post.platform === 'x' && <Twitter size={12} />}
+                        {post.platform === 'linkedin' && <Linkedin size={12} aria-hidden="true" />}
+                        {post.platform === 'x' && <Twitter size={12} aria-hidden="true" />}
                         <span>{formatTime(post.scheduledTime)}</span>
                       </div>
                       <p className="post-preview">
@@ -327,25 +330,25 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
       )}
 
       {activeTab === 'queue' && (
-        <div className="queue-view">
-          <table className="queue-table">
+        <div id="queue-panel" role="tabpanel" className="queue-view">
+          <table className="queue-table" aria-label="Content queue">
             <thead>
               <tr>
-                <th>Platform</th>
-                <th>Preview</th>
-                <th>Scheduled</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th scope="col">Platform</th>
+                <th scope="col">Preview</th>
+                <th scope="col">Scheduled</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {[...mockContent, ...contentQueue].map((item) => (
+              {allContent.map((item) => (
                 <tr key={item.id}>
                   <td>
                     <div className="platform-cell">
-                      {item.platform === 'linkedin' && <Linkedin size={18} />}
-                      {item.platform === 'x' && <Twitter size={18} />}
-                      {item.platform === 'email' && <Mail size={18} />}
+                      {item.platform === 'linkedin' && <Linkedin size={18} aria-label="LinkedIn" />}
+                      {item.platform === 'x' && <Twitter size={18} aria-label="X" />}
+                      {item.platform === 'email' && <Mail size={18} aria-label="Email" />}
                     </div>
                   </td>
                   <td>
@@ -355,12 +358,9 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
                   </td>
                   <td>
                     <div className="scheduled-cell">
-                      <Calendar size={14} />
-                      {new Date(item.scheduledTime).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                      <Clock size={14} />
+                      <Calendar size={14} aria-hidden="true" />
+                      {formatDate(item.scheduledTime)}
+                      <Clock size={14} aria-hidden="true" />
                       {formatTime(item.scheduledTime)}
                     </div>
                   </td>
@@ -371,15 +371,19 @@ ${platform === 'linkedin-comment' ? 'Keep it under 200 characters, thoughtful an
                   </td>
                   <td>
                     <div className="queue-actions">
-                      <button className="queue-btn primary">
-                        <Send size={14} />
+                      <button className="queue-btn primary" aria-label="Publish now">
+                        <Send size={14} aria-hidden="true" />
                         Publish Now
                       </button>
-                      <button className="queue-btn">
-                        <Edit2 size={14} />
+                      <button className="queue-btn" aria-label="Edit">
+                        <Edit2 size={14} aria-hidden="true" />
                       </button>
-                      <button className="queue-btn danger" onClick={() => removeFromContentQueue(item.id)}>
-                        <XCircle size={14} />
+                      <button
+                        className="queue-btn danger"
+                        onClick={() => removeFromContentQueue(item.id)}
+                        aria-label="Delete"
+                      >
+                        <XCircle size={14} aria-hidden="true" />
                       </button>
                     </div>
                   </td>
