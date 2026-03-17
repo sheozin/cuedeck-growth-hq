@@ -16,9 +16,9 @@ const pageTitles = {
 };
 
 const initialNotifications = [
-  { id: 1, type: 'hot_lead', message: 'New hot lead: Sarah Chen from TechCorp', time: '5 min ago', read: false },
-  { id: 2, type: 'reply', message: 'Reply received from Michael Brown', time: '1 hour ago', read: false },
-  { id: 3, type: 'agent', message: 'LinkedIn Agent completed 20 connections', time: '2 hours ago', read: true },
+  { id: 1, type: 'hot_lead', message: 'New hot lead: Sarah Chen from TechCorp', time: '5 min ago', read: false, link: '/pipeline' },
+  { id: 2, type: 'reply', message: 'Reply received from Michael Brown', time: '1 hour ago', read: false, link: '/email' },
+  { id: 3, type: 'agent', message: 'LinkedIn Agent completed 20 connections', time: '2 hours ago', read: true, link: '/linkedin' },
 ];
 
 function TopBar() {
@@ -72,6 +72,14 @@ function TopBar() {
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
   }, []);
+
+  const handleNotificationNavigate = useCallback((notification) => {
+    markAsRead(notification.id);
+    setShowNotifications(false);
+    if (notification.link) {
+      navigate(notification.link);
+    }
+  }, [markAsRead, navigate]);
 
   const markAllAsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
@@ -146,7 +154,7 @@ function TopBar() {
                     >
                       <div
                         className="notification-content"
-                        onClick={() => markAsRead(notification.id)}
+                        onClick={() => handleNotificationNavigate(notification)}
                       >
                         <p className="notification-message">{notification.message}</p>
                         <span className="notification-time">{notification.time}</span>
