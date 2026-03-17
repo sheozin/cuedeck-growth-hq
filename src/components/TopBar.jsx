@@ -16,15 +16,18 @@ const pageTitles = {
 };
 
 const initialNotifications = [
-  { id: 1, type: 'hot_lead', message: 'New hot lead: Sarah Chen from TechCorp', time: '5 min ago', read: false, link: '/pipeline' },
-  { id: 2, type: 'reply', message: 'Reply received from Michael Brown', time: '1 hour ago', read: false, link: '/email' },
+  { id: 1, type: 'hot_lead', message: 'New hot lead: Sarah Chen from TechCorp', time: '5 min ago', read: false, link: '/pipeline', leadId: '3' },
+  { id: 2, type: 'reply', message: 'Reply received from Michael Brown', time: '1 hour ago', read: false, link: '/pipeline', leadId: '5' },
   { id: 3, type: 'agent', message: 'LinkedIn Agent completed 20 connections', time: '2 hours ago', read: true, link: '/linkedin' },
 ];
 
 function TopBar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { agentStatuses, updateAgentStatus } = useStore();
+  const agentStatuses = useStore((state) => state.agentStatuses);
+  const updateAgentStatus = useStore((state) => state.updateAgentStatus);
+  const leads = useStore((state) => state.leads);
+  const openLeadDrawer = useStore((state) => state.openLeadDrawer);
   const title = pageTitles[location.pathname] || 'Dashboard';
 
   const [notifications, setNotifications] = useState(initialNotifications);
@@ -76,10 +79,22 @@ function TopBar() {
   const handleNotificationNavigate = useCallback((notification) => {
     markAsRead(notification.id);
     setShowNotifications(false);
+
+    if (notification.leadId) {
+      // Find the lead and open drawer
+      const lead = leads.find(l => l.id === notification.leadId);
+      if (lead) {
+        navigate(notification.link || '/pipeline');
+        // Small delay to allow navigation, then open drawer
+        setTimeout(() => openLeadDrawer(lead), 100);
+        return;
+      }
+    }
+
     if (notification.link) {
       navigate(notification.link);
     }
-  }, [markAsRead, navigate]);
+  }, [markAsRead, navigate, leads, openLeadDrawer]);
 
   const markAllAsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
