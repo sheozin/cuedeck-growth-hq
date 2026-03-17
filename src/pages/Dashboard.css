@@ -1,0 +1,268 @@
+.dashboard {
+  padding: 24px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  background-color: #4A8EFF15;
+  color: #4A8EFF;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #08172E;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.stat-delta {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.stat-delta.positive {
+  color: #22c55e;
+}
+
+.stat-delta.negative {
+  color: #ef4444;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #08172E;
+  margin: 0 0 16px 0;
+}
+
+.agents-panel {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.agents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-panel {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-feed {
+  flex: 1;
+  max-height: 480px;
+  overflow-y: auto;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-size: 11px;
+  background-color: #0d1117;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.activity-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #21262d;
+  color: #8b949e;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-time {
+  color: #6e7681;
+  min-width: 50px;
+}
+
+.activity-agent {
+  color: #58a6ff;
+  min-width: 120px;
+}
+
+.activity-action {
+  color: #c9d1d9;
+  flex: 1;
+}
+
+.hot-leads-panel {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.hot-leads-table-wrapper {
+  overflow-x: auto;
+}
+
+.hot-leads-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.hot-leads-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.hot-leads-table td {
+  padding: 16px;
+  color: #08172E;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.hot-leads-table tr:last-child td {
+  border-bottom: none;
+}
+
+.lead-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lead-avatar-small {
+  width: 32px;
+  height: 32px;
+  background-color: #08172E;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.signal-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: #fef3c7;
+  color: #d97706;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.platform-icons {
+  display: flex;
+  gap: 6px;
+  color: #64748b;
+}
+
+.action-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.view-btn,
+.dismiss-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  background-color: #4A8EFF;
+  border-color: #4A8EFF;
+  color: #fff;
+}
+
+.dismiss-btn:hover {
+  background-color: #f1f5f9;
+  color: #08172E;
+}
+
+@media (max-width: 1200px) {
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 16px;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .hot-leads-table th:nth-child(3),
+  .hot-leads-table td:nth-child(3),
+  .hot-leads-table th:nth-child(4),
+  .hot-leads-table td:nth-child(4) {
+    display: none;
+  }
+}

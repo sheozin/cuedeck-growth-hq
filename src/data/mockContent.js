@@ -1,0 +1,142 @@
+export const mockContent = [
+  {
+    id: '1',
+    platform: 'linkedin',
+    content: 'Running a 1000+ person conference? Here\'s what most event managers get wrong about session transitions:\n\n1. No real-time status visibility\n2. Manual coordination between AV and speakers\n3. Zero incident tracking\n\nWe built CueDeck to solve exactly this. 8-state session machine. 6 operator roles. Real-time sync.\n\nDM me "DEMO" for a walkthrough.',
+    scheduledTime: '2024-01-16T09:00:00Z',
+    status: 'Scheduled',
+    type: 'post',
+  },
+  {
+    id: '2',
+    platform: 'x',
+    content: 'Hot take: Most event tech is built for event MARKETERS, not event OPERATORS.\n\nThat\'s why we focused CueDeck entirely on the production control room.\n\nYour signage. Your interpreters. Your session flow. All in one view.',
+    scheduledTime: '2024-01-16T14:00:00Z',
+    status: 'Scheduled',
+    type: 'post',
+  },
+  {
+    id: '3',
+    platform: 'linkedin',
+    content: 'The hidden cost of running events on spreadsheets:\n\n→ 2 hours/day updating session status manually\n→ 5-10 minutes lost per delayed session\n→ Miscommunication between stage manager and AV\n→ No post-event data to improve next time\n\nSound familiar?\n\nCueDeck automates all of this for €99/month.\n\n#eventtech #conferencemanagement',
+    scheduledTime: '2024-01-17T10:00:00Z',
+    status: 'Scheduled',
+    type: 'post',
+  },
+  {
+    id: '4',
+    platform: 'x',
+    content: 'Thread 🧵\n\nHow we cut interpreter coordination time by 70% at a bilingual conference:\n\n1/ The problem: 3 languages, 12 sessions, 6 interpreter booths. Pure chaos.\n\n2/ Old way: WhatsApp groups + printed schedules. Interpreters constantly asking "which session is next?"\n\n3/ With CueDeck: Real-time session status pushed to interpreter displays. They see exactly what\'s coming.',
+    scheduledTime: '2024-01-17T15:00:00Z',
+    status: 'Scheduled',
+    type: 'thread',
+  },
+  {
+    id: '5',
+    platform: 'linkedin',
+    content: 'Unpopular opinion: Event tech should be INVISIBLE to attendees.\n\nIf your audience notices the technology, something went wrong.\n\nCueDeck is designed for the people behind the scenes - the production team making magic happen.\n\nNo attendee app. No check-in kiosks. Just smooth operations.',
+    scheduledTime: '2024-01-18T11:00:00Z',
+    status: 'Scheduled',
+    type: 'post',
+  },
+  {
+    id: '6',
+    platform: 'x',
+    content: 'Event production teams, quick question:\n\nHow do you currently communicate session delays to your AV team, signage operators, and interpreters?\n\n🔁 WhatsApp chaos\n📋 Printed runsheets\n🎧 Radio only\n💻 Dedicated software\n\nCurious what\'s working (and what\'s not).',
+    scheduledTime: '2024-01-18T16:00:00Z',
+    status: 'Draft',
+    type: 'poll',
+  },
+  {
+    id: '7',
+    platform: 'linkedin',
+    content: 'New feature alert 🚀\n\nAI Incident Advisor is now live in CueDeck.\n\nWhen something goes wrong (speaker no-show, AV failure, schedule slip), the AI suggests:\n→ Immediate actions\n→ Who to notify\n→ How to communicate to attendees\n\nBuilt from 500+ real incident reports.\n\nDM for early access.',
+    scheduledTime: '2024-01-19T09:30:00Z',
+    status: 'Scheduled',
+    type: 'post',
+  },
+  {
+    id: '8',
+    platform: 'x',
+    content: 'Conference organizers: Your production team deserves better tools.\n\nStop making them use spreadsheets and group chats to run a €500k event.\n\nCueDeck starts at €39/event. Worth every cent for the stress reduction alone.',
+    scheduledTime: '2024-01-19T14:30:00Z',
+    status: 'Scheduled',
+    type: 'post',
+  },
+  {
+    id: '9',
+    platform: 'linkedin',
+    content: 'Case study incoming:\n\nInfoshare (5000 attendees, 100+ sessions) just ran their first event with CueDeck.\n\nResults:\n✅ 40% reduction in stage-to-AV miscommunication\n✅ Real-time session tracking for first time ever\n✅ Post-event report generated in 2 minutes vs 2 days\n\nFull write-up dropping next week.',
+    scheduledTime: '2024-01-20T10:00:00Z',
+    status: 'Draft',
+    type: 'post',
+  },
+  {
+    id: '10',
+    platform: 'x',
+    content: 'The best compliment we got from a client:\n\n"Our AV team asked if they could keep using CueDeck after the event ended."\n\nThat\'s when you know you built the right thing. 🎯',
+    scheduledTime: '2024-01-20T15:00:00Z',
+    status: 'Scheduled',
+    type: 'post',
+  },
+];
+
+export const mockLinkedinQueue = [
+  { id: '1', name: 'New Lead', title: 'Event Director', company: 'Future Events', action: 'Connect', scheduledTime: '2024-01-15T12:00:00Z', status: 'Queued' },
+  { id: '2', name: 'Marcus Weber', title: 'AV Manager', company: 'Munich Conferences', action: 'View Profile', scheduledTime: '2024-01-15T12:15:00Z', status: 'Queued' },
+  { id: '3', name: 'Lisa Chen', title: 'Conference Producer', company: 'Asia Events Hub', action: 'Connect', scheduledTime: '2024-01-15T12:30:00Z', status: 'Queued' },
+  { id: '4', name: 'David Park', title: 'Head of Operations', company: 'Seoul Congress', action: 'Comment on Post', scheduledTime: '2024-01-15T12:45:00Z', status: 'Queued' },
+  { id: '5', name: 'Elena Popova', title: 'Event Tech Lead', company: 'Moscow Events', action: 'Connect', scheduledTime: '2024-01-15T13:00:00Z', status: 'Queued' },
+  { id: '6', name: 'Carlos Rodriguez', title: 'Production Manager', company: 'Barcelona Expo', action: 'View Profile', scheduledTime: '2024-01-15T13:15:00Z', status: 'Queued' },
+  { id: '7', name: 'Sarah Johnson', title: 'Conference Director', company: 'NYC Events Co', action: 'Connect', scheduledTime: '2024-01-15T13:30:00Z', status: 'Queued' },
+  { id: '8', name: 'Pierre Dubois', title: 'AV Coordinator', company: 'Paris Convention', action: 'Connect', scheduledTime: '2024-01-15T13:45:00Z', status: 'Queued' },
+  { id: '9', name: 'Yuki Tanaka', title: 'Event Manager', company: 'Tokyo Conferences', action: 'Follow', scheduledTime: '2024-01-15T14:00:00Z', status: 'Queued' },
+  { id: '10', name: 'Anna Schmidt', title: 'Production Lead', company: 'Vienna Congress', action: 'Connect', scheduledTime: '2024-01-15T14:15:00Z', status: 'Queued' },
+];
+
+export const mockLinkedinLog = [
+  { id: '1', timestamp: '2024-01-15T11:45:00Z', action: 'Connect', target: 'Piotr Zieliński', result: 'Accepted' },
+  { id: '2', timestamp: '2024-01-15T11:30:00Z', action: 'View Profile', target: 'Hans Mueller', result: 'Viewed' },
+  { id: '3', timestamp: '2024-01-15T11:15:00Z', action: 'Connect', target: 'Katarzyna Dąbrowska', result: 'Sent' },
+  { id: '4', timestamp: '2024-01-15T11:00:00Z', action: 'Comment', target: 'TechConf Berlin', result: 'Posted' },
+  { id: '5', timestamp: '2024-01-15T10:45:00Z', action: 'Connect', target: 'Sophie van der Berg', result: 'Sent' },
+  { id: '6', timestamp: '2024-01-15T10:30:00Z', action: 'DM', target: 'Anna Wiśniewska', result: 'Sent' },
+  { id: '7', timestamp: '2024-01-15T10:15:00Z', action: 'Connect', target: 'Klaus Schmidt', result: 'Sent' },
+  { id: '8', timestamp: '2024-01-15T10:00:00Z', action: 'View Profile', target: 'Ahmed El-Masry', result: 'Viewed' },
+  { id: '9', timestamp: '2024-01-14T18:30:00Z', action: 'Connect', target: 'James Wilson', result: 'Ignored' },
+  { id: '10', timestamp: '2024-01-14T18:15:00Z', action: 'Connect', target: 'Emma Thompson', result: 'Sent' },
+];
+
+export const mockXQueue = [
+  { id: '1', author: '@eventtech_pro', tweet: 'Just wrapped up our annual conference. Tech setup was a nightmare as usual...', action: 'Reply', reply: 'Feel your pain! What was the biggest challenge? We\'ve been working on solutions for exactly this.', status: 'pending' },
+  { id: '2', author: '@conference_mgr', tweet: 'Looking for recommendations on session management tools. Currently using spreadsheets 😅', action: 'Reply', reply: 'Happy to share what we built at CueDeck. DM open if you want a quick walkthrough!', status: 'pending' },
+  { id: '3', author: '@av_production', tweet: 'Interpreters + multiple stages + live streaming = production chaos', action: 'Like', reply: '', status: 'pending' },
+  { id: '4', author: '@eventprof_daily', tweet: 'Great thread on modern event production tech', action: 'Retweet', reply: '', status: 'pending' },
+  { id: '5', author: '@expo_manager', tweet: 'Anyone else struggling with real-time communication at large events?', action: 'Reply', reply: 'Definitely a common challenge. What\'s your current setup for stage-to-AV communication?', status: 'pending' },
+  { id: '6', author: '@conf_tech_hub', tweet: 'The future of events is hybrid, but the tech isn\'t ready yet', action: 'Like', reply: '', status: 'pending' },
+  { id: '7', author: '@production_pro', tweet: 'Wish there was a tool that handled session states automatically', action: 'Reply', reply: 'We actually built exactly this! 8-state session machine. Would love your feedback on the approach.', status: 'pending' },
+  { id: '8', author: '@events_insider', tweet: 'Post-event reporting takes us days. There has to be a better way.', action: 'Reply', reply: 'What if it took 2 minutes? Serious question - we\'re solving this right now.', status: 'pending' },
+  { id: '9', author: '@stage_mgr', tweet: 'Another day, another delayed keynote 🙃', action: 'Like', reply: '', status: 'pending' },
+  { id: '10', author: '@eventtech_news', tweet: 'New survey: 78% of event organizers want better production tools', action: 'Retweet', reply: '', status: 'pending' },
+];
+
+export const mockXScheduled = [
+  { id: '1', content: 'Event tech tip: Your interpreters shouldn\'t have to ask "which session is next?" That\'s a workflow problem, not a people problem.', scheduledTime: '2024-01-16T14:00:00Z', status: 'Scheduled' },
+  { id: '2', content: 'Hot take: Spreadsheets are not event management software. They\'re a cry for help.', scheduledTime: '2024-01-17T10:00:00Z', status: 'Scheduled' },
+  { id: '3', content: 'Built for the backstage, not the ballroom. That\'s the CueDeck philosophy.', scheduledTime: '2024-01-18T15:00:00Z', status: 'Scheduled' },
+  { id: '4', content: 'Your AV team + your stage manager + your interpreters = all in sync. Finally possible.', scheduledTime: '2024-01-19T11:00:00Z', status: 'Scheduled' },
+  { id: '5', content: 'Post-event reports in 2 minutes. Not 2 days. That\'s the goal, and we hit it.', scheduledTime: '2024-01-20T14:00:00Z', status: 'Draft' },
+];
+
+export const mockEmailContacts = [
+  { id: '1', name: 'Agnieszka Kowalska', company: 'Infoshare', sequence: 'Cold Outreach Wave 3', step: 3, lastSent: '2024-01-14T09:00:00Z', status: 'Active' },
+  { id: '2', name: 'Hans Mueller', company: 'TechConf Berlin', sequence: 'Cold Outreach Wave 3', step: 2, lastSent: '2024-01-14T08:00:00Z', status: 'Active' },
+  { id: '3', name: 'Magdalena Kaczmarek', company: 'Poznań Convention Bureau', sequence: 'Cold Outreach Wave 3', step: 2, lastSent: '2024-01-14T12:00:00Z', status: 'Active' },
+  { id: '4', name: 'Piotr Zieliński', company: 'Kraków Congress Centre', sequence: 'LinkedIn Follow-Up', step: 1, lastSent: '2024-01-12T10:00:00Z', status: 'Active' },
+  { id: '5', name: 'Katarzyna Dąbrowska', company: 'Event Masters Poland', sequence: 'LinkedIn Follow-Up', step: 1, lastSent: '2024-01-12T10:30:00Z', status: 'Active' },
+  { id: '6', name: 'Michał Nowak', company: 'Impact CEE', sequence: 'Cold Outreach Wave 3', step: 3, lastSent: '2024-01-13T10:00:00Z', status: 'Replied' },
+  { id: '7', name: 'James Wilson', company: 'London Events Group', sequence: 'Re-engagement', step: 2, lastSent: '2024-01-10T09:00:00Z', status: 'Active' },
+  { id: '8', name: 'Emma Thompson', company: 'UK Conference Services', sequence: 'Re-engagement', step: 2, lastSent: '2024-01-10T09:30:00Z', status: 'Active' },
+  { id: '9', name: 'Old Contact', company: 'Invalid Corp', sequence: 'Cold Outreach Wave 3', step: 1, lastSent: '2024-01-08T09:00:00Z', status: 'Bounced' },
+  { id: '10', name: 'Unsubscribed Lead', company: 'Former Prospect', sequence: 'Cold Outreach Wave 3', step: 2, lastSent: '2024-01-09T09:00:00Z', status: 'Unsubscribed' },
+];
