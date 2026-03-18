@@ -9,7 +9,12 @@ import {
   Mail,
   Settings,
   Menu,
-  BookOpen
+  BookOpen,
+  BarChart3,
+  FileText,
+  UsersRound,
+  Plug,
+  Zap
 } from 'lucide-react';
 import useStore from '../store/useStore';
 import './Sidebar.css';
@@ -21,7 +26,12 @@ const navItems = [
   { path: '/linkedin', icon: Linkedin, label: 'LinkedIn Agent' },
   { path: '/x', icon: Twitter, label: 'X Agent' },
   { path: '/email', icon: Mail, label: 'Email Agent' },
-  { path: '/settings', icon: Settings, label: 'Settings' },
+  { path: '/analytics', icon: BarChart3, label: 'Analytics', divider: true },
+  { path: '/templates', icon: FileText, label: 'Templates' },
+  { path: '/community', icon: UsersRound, label: 'Community' },
+  { path: '/integrations', icon: Plug, label: 'Integrations' },
+  { path: '/growth-tools', icon: Zap, label: 'Growth Tools' },
+  { path: '/settings', icon: Settings, label: 'Settings', divider: true },
   { path: '/guide', icon: BookOpen, label: 'Guide' },
 ];
 
@@ -59,16 +69,18 @@ function Sidebar() {
 
       <nav className="sidebar-nav" aria-label="Main menu">
         {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            title={sidebarCollapsed ? item.label : undefined}
-            aria-label={item.label}
-          >
-            <item.icon size={20} aria-hidden="true" />
-            {!sidebarCollapsed && <span>{item.label}</span>}
-          </NavLink>
+          <React.Fragment key={item.path}>
+            {item.divider && <div className="nav-divider" />}
+            <NavLink
+              to={item.path}
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              title={sidebarCollapsed ? item.label : undefined}
+              aria-label={item.label}
+            >
+              <item.icon size={20} aria-hidden="true" />
+              {!sidebarCollapsed && <span>{item.label}</span>}
+            </NavLink>
+          </React.Fragment>
         ))}
       </nav>
 

@@ -16,6 +16,11 @@ const XAgent = lazy(() => import('./pages/XAgent'));
 const EmailAgent = lazy(() => import('./pages/EmailAgent'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Guide = lazy(() => import('./pages/Guide'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const Templates = lazy(() => import('./pages/Templates'));
+const Community = lazy(() => import('./pages/Community'));
+const Integrations = lazy(() => import('./pages/Integrations'));
+const GrowthTools = lazy(() => import('./pages/GrowthTools'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -50,6 +55,11 @@ function App() {
                   <Route path="/email" element={<EmailAgent />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/guide" element={<Guide />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/templates" element={<Templates />} />
+                  <Route path="/community" element={<Community />} />
+                  <Route path="/integrations" element={<Integrations />} />
+                  <Route path="/growth-tools" element={<GrowthTools />} />
                 </Routes>
               </Suspense>
             </ErrorBoundary>

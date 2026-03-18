@@ -11,6 +11,11 @@ const pageTitles = {
   '/linkedin': 'LinkedIn Agent',
   '/x': 'X Agent',
   '/email': 'Email Agent',
+  '/analytics': 'Analytics',
+  '/templates': 'Templates',
+  '/community': 'Community',
+  '/integrations': 'Integrations',
+  '/growth-tools': 'Growth Tools',
   '/settings': 'Settings',
   '/guide': 'Guide',
 };
